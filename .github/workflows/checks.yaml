@@ -1,0 +1,38 @@
+name: checks
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+      - name: setup npm
+        run: |
+          git config user.email "zmi@gm.com"
+          git config user.name "zmi"
+      - name: set preview version
+        run: npm version prerelease --preid=$GITHUB_SHA
+        if: github.ref != 'refs/heads/master'
+      - name: publish
+        id: publish
+        run: |
+          VERSION="1.1.1"
+          echo "::set-output name=VERSION::$VERSION"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTOMATION_TOKEN}}
+      - name: create release
+        if: github.ref == 'refs/heads/master'
+        run: |
+          gh release create-n "npm release version ${{ steps.publish.outputs.VERSION }}"
+      - uses: peter-evans/commit-comment@v1
+        with:
+          body: |
+            your design-system version is `${{ steps.publish.outputs.VERSION }}`
