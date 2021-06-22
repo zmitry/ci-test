@@ -31,7 +31,7 @@ jobs:
       - name: create release
         if: github.ref == 'refs/heads/master'
         run: |
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} gh release create -n "npm release version ${{ steps.publish.outputs.VERSION }}"  $GITHUB_SHA 
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} gh release create -t "npm release version ${{ steps.publish.outputs.VERSION }}" -n "npm release version ${{ steps.publish.outputs.VERSION }}" $(git rev-parse --short HEAD)
       - uses: peter-evans/commit-comment@v1
         with:
           body: |
