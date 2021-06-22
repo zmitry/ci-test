@@ -33,9 +33,10 @@ jobs:
       - name: create release
         if: github.ref == 'refs/heads/master'
         run: |
-       
           LATEST_RELEASE=$(GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} gh release view --json 'tagName' -t '{{.tagName}}')
           VERSION=${{ steps.publish.outputs.VERSION }}
+          git tag $VERSION
+          git push --tags
           echo # Release changes for $VERSION > release.md
           git log $LATEST_RELEASE..HEAD --pretty="format:(%h) %s" > release.md
           GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}  gh release create -t "$VERSION" -F './release.md' $(git rev-parse --short HEAD)
