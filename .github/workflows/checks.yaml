@@ -31,7 +31,7 @@ jobs:
       - name: create release
         if: github.ref == 'refs/heads/master'
         run: |
-          gh release create-n "npm release version ${{ steps.publish.outputs.VERSION }}"
+          gh release create "npm release version ${{ steps.publish.outputs.VERSION }}"
       - uses: peter-evans/commit-comment@v1
         with:
           body: |
