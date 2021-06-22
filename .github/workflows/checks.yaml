@@ -26,17 +26,19 @@ jobs:
       - name: publish
         id: publish
         run: |
-          VERSION="1.1.1"
+          VERSION=".1.1"
           echo "::set-output name=VERSION::$VERSION"
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTOMATION_TOKEN}}
       - name: create release
         if: github.ref == 'refs/heads/master'
         run: |
+       
           LATEST_RELEASE=$(GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} gh release view --json 'tagName' -t '{{.tagName}}')
-          echo # Release changes > release.md
+          VERSION=${{ steps.publish.outputs.VERSION }}
+          echo # Release changes for $VERSION > release.md
           git log $LATEST_RELEASE..HEAD --pretty="format:(%h) %s" > release.md
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} gh release create -t "npm release version ${{ steps.publish.outputs.VERSION }}" -F './release.md' $(git rev-parse --short HEAD)
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}  gh release create -t "$VERSION" -F './release.md' $(git rev-parse --short HEAD)
       - uses: peter-evans/commit-comment@v1
         with:
           body: |
