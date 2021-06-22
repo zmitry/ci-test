@@ -26,7 +26,7 @@ jobs:
       - name: publish
         id: publish
         run: |
-          VERSION="1.1.1"
+          VERSION="1.1.2"
           echo "::set-output name=VERSION::$VERSION"
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTOMATION_TOKEN}}
@@ -39,7 +39,7 @@ jobs:
           git push --tags
           echo # Release changes for $VERSION > release.md
           git log $LATEST_RELEASE..HEAD --pretty="format:(%h) %s" > release.md
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}  gh release create --target $VERSION -t "$VERSION" -F './release.md' $VERSION
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}  gh release create --target $(git rev-parse HEAD) -t "$VERSION" -F './release.md' $VERSION
       - uses: peter-evans/commit-comment@v1
         with:
           body: |
